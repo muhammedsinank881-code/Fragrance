@@ -76,13 +76,14 @@ const ProductProvider = ({ children }) => {
         const headers = {
           page: page,
           pageSize: pageSize,
-        };
+        };  
 
         if (searchQuery) headers.productName = searchQuery;
         if (selectedCategory && selectedCategory.length > 0) headers.categoryID = selectedCategory.join(",");
         if (selectedBrands && selectedBrands.length > 0) headers.brandID = selectedBrands.join(",");
 
         response = await API.get(ENDPOINTS.PRODUCT_MASTER, { headers });
+        
       } else {
         // API 1: Initial Render
         response = await API.get(ENDPOINTS.PRODUCT_MASTER, {
