@@ -1,8 +1,8 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
-   headers: {
+  baseURL: "https://dilkacenter-eqagg4ame5dqdfae.canadacentral-01.azurewebsites.net",
+  headers: {
     accept: "*/*",
     "Content-Type": "application/json",
   },
