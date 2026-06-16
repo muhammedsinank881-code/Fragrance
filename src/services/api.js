@@ -1,11 +1,11 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "https://dilkacenter-eqagg4ame5dqdfae.canadacentral-01.azurewebsites.net",
+  baseURL: import.meta.env.VITE_API_URL,
   headers: {
     accept: "*/*",
     "Content-Type": "application/json",
   },
 });
-
+console.log(import.meta.env.VITE_API_URL, "url");
 export default API; 
