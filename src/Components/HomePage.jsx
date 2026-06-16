@@ -272,14 +272,15 @@ const HomePage = () => {
           )}
         </div>
       </div>
-    </div>
+    </div>)
 
-    {/* Product Detail Modal */}
-    <SelectedProductMOdal
-      selectedProduct={selectedProduct}
-      setSelectedProduct={setSelectedProduct}
-    />
-  );
+  {/* Product Detail Modal */ }
+  <SelectedProductMOdal
+    selectedProduct={selectedProduct}
+    setSelectedProduct={setSelectedProduct}
+  />
+
+
 };
 
 export default HomePage;
