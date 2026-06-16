@@ -42,8 +42,6 @@ const ProductProvider = ({ children }) => {
         (minPrice !== "" && Number(minPrice) > 0) ||
         (maxPrice !== "" && Number(maxPrice) > 0) ||
         sortBy || sortType;
-
-      console.log(isAdvanceFilter, "isAdvanceFilter");
       
 
       const isBasicFilter =

@@ -7,6 +7,7 @@ import ProductCard from "./ProductCard";
 import AddBoard from "./AddBoard";
 import LoadingEffect from "./LoadingEffect";
 import { useDebounce } from "../hooks/useDebounce";
+import SidebarContent from "./SidebarContent";
 import SelectedProductMOdal from "./SelectedProductMOdal";
 
 const HomePage = () => {
@@ -28,6 +29,8 @@ const HomePage = () => {
     sortBy,
     sortType,
     rating,
+    minPrice,
+    maxPrice,
     setMinPrice,
     setMaxPrice,
     currentPage, setCurrentPage,
@@ -46,6 +49,9 @@ const HomePage = () => {
 
   const [selectedProduct, setSelectedProduct] = useState(null);
 
+  const debouncedMinInput = useDebounce(minInput);
+  const debouncedMaxInput = useDebounce(maxInput);
+
 
   const displayProducts = includeOutOfStock ? products : products.filter((p) => p.stockQty > 0);
   const totalPages = Math.ceil(totalCount / 20);
@@ -58,8 +64,8 @@ const HomePage = () => {
       searchQuery,
       selectedCategory,
       selectedBrands,
-      minPrice: minInput,
-      maxPrice: maxInput,
+      minPrice: debouncedMinInput,
+      maxPrice: debouncedMaxInput,
       rating,
       sortBy,
       sortType,
@@ -69,24 +75,19 @@ const HomePage = () => {
     searchQuery,
     selectedCategory,
     selectedBrands,
-    minInput,
-    maxInput,
+    debouncedMinInput,
+    debouncedMaxInput,
     rating,
     sortBy,
     sortType
   ]);
 
-  const debouncedMinInput = useDebounce(minInput);
-  const debouncedMaxInput = useDebounce(maxInput);
-
   // debounce  for price range
   useEffect(() => {
-    if (debouncedMinInput !== (minInput || "") || debouncedMaxInput !== (maxInput || "")) {
-      setMinPrice(debouncedMinInput);
-      setMaxPrice(debouncedMaxInput);
-      setCurrentPage(1);
-    }
-  }, [debouncedMinInput, debouncedMaxInput, minInput, maxInput]);
+    setMinPrice(debouncedMinInput);
+    setMaxPrice(debouncedMaxInput);
+    setCurrentPage(1);
+  }, [debouncedMinInput, debouncedMaxInput]);
 
   // useEffect(() => {
   //   if (!minPrice) setminInput("");
@@ -102,92 +103,6 @@ const HomePage = () => {
   }, [searchQuery]);
 
   if (loading) return <LoadingEffect />;
-
-  // JSX Extraction for reusable Sidebar Rendering code
-  const SidebarContent = () => (
-    <>
-      {/* Category */}
-      <div className="bg-white shadow-xl rounded-2xl p-5 border border-[#EEEEEE]">
-        <div className="flex items-center justify-between mb-5">
-          <h3 className="text-[20px] md:text-[24px] font-medium">FRAGRANCE</h3>
-          {selectedCategory.length > 0 && (
-            <button className="text-[10px] text-gray-400 hover:text-black transition-colors" onClick={clearFilters}>
-              Clear
-            </button>
-          )}
-        </div>
-        <div className="flex flex-col gap-3 text-[15px]">
-          {categories.map((item) => (
-            <label key={item.id} className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" checked={selectedCategory.includes(item.id)} onChange={() => handleCategoryFilter(item.id)} />
-              {item.name}
-            </label>
-          ))}
-        </div>
-      </div>
-
-      {/* Rating */}
-      <div className="bg-white shadow-xl rounded-2xl p-5 border border-[#EEEEEE]">
-        <h3 className="text-[20px] md:text-[24px] font-medium mb-5">FILTER BY RATING</h3>
-        <div className="flex flex-col gap-3">
-          {[5, 4, 3, 2, 1].map((star) => (
-            <label key={star} className="flex items-center gap-2 text-[15px] cursor-pointer">
-              <input type="checkbox" checked={rating === star} onChange={() => handleRating(star)} />
-              <span className="text-[#E6B325]">
-                {"★".repeat(star)}
-                <span className="text-gray-300">{"★".repeat(5 - star)}</span>
-              </span>
-              <span className="text-gray-500">({star} Star)</span>
-            </label>
-          ))}
-        </div>
-      </div>
-
-      {/* Price Range */}
-      <div className="bg-white shadow-xl rounded-2xl p-5 border border-[#EEEEEE]">
-        <h3 className="text-[20px] md:text-[24px] font-medium mb-5">PRICE</h3>
-        <div className="flex flex-col gap-3">
-          <input
-            type="text"
-            placeholder="Min Price"
-            value={minInput}
-            onChange={(e) => setminInput(e.target.value)}
-            className="border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400 w-full"
-          />
-          <input
-            type="text"
-            placeholder="Max Price"
-            value={maxInput}
-            onChange={(e) => setmaxInput(e.target.value)}
-            className="border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-gray-400 w-full"
-          />
-        </div>
-      </div>
-
-      {/* Availability */}
-      <div className="bg-white shadow-xl rounded-2xl p-5 border border-[#EEEEEE]">
-        <h3 className="text-[20px] md:text-[24px] font-medium mb-5">AVAILABILITY</h3>
-        <label className="flex items-center gap-2 text-[15px] cursor-pointer">
-          <input type="checkbox" checked={includeOutOfStock} onChange={(e) => setIncludeOutOfStock(e.target.checked)} />
-          Include out of stock
-        </label>
-        {!includeOutOfStock && <p className="text-[11px] text-gray-400 mt-2">Hiding out-of-stock items (display only)</p>}
-      </div>
-
-      {/* Brands */}
-      <div className="bg-white shadow-xl rounded-2xl p-5 border border-[#EEEEEE]">
-        <h3 className="text-[20px] md:text-[24px] font-medium mb-5">BRANDS</h3>
-        <div className="flex flex-col gap-3 text-[15px]">
-          {brands.map((item) => (
-            <label key={item.id} className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" checked={selectedBrands.includes(item.id)} onChange={() => handleBrandFilter(item.id)} />
-              {item.name}
-            </label>
-          ))}
-        </div>
-      </div>
-    </>
-  );
 
   return (
     <div className="w-full px-4 sm:px-8 md:px-14 lg:px-20 bg-white relative">
@@ -208,13 +123,29 @@ const HomePage = () => {
               <span className="font-bold text-lg">Filter Products</span>
               <button onClick={() => setMobileSidebarOpen(false)} className="text-xl p-1"><FiX /></button>
             </div>
-            <SidebarContent />
+            <SidebarContent
+              selectedCategory={selectedCategory}
+              clearFilters={clearFilters}
+              categories={categories}
+              handleCategoryFilter={handleCategoryFilter}
+              rating={rating}
+              handleRating={handleRating}
+              minInput={minInput}
+              setminInput={setminInput}
+              maxInput={maxInput}
+              setmaxInput={setmaxInput}
+              includeOutOfStock={includeOutOfStock}
+              setIncludeOutOfStock={setIncludeOutOfStock}
+              brands={brands}
+              selectedBrands={selectedBrands}
+              handleBrandFilter={handleBrandFilter}
+            />
           </div>
         </div>
       )}
 
       {/* Top Header */}
-      <div className="flex flex-col items-start w-full">
+      <div className="flex flex-col items-start w-full max-w-7xl mx-auto">
         <h1 className="text-[32px] md:text-[40px] font-normal leading-none">Fragrance</h1>
 
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center w-full gap-4 mt-4">
@@ -264,14 +195,30 @@ const HomePage = () => {
       </div>
 
       {/* Main Section layout container splits */}
-      <div className="flex gap-6 mt-8 justify-center items-start">
+      <div className="flex gap-6 mt-8 justify-center items-start max-w-7xl mx-auto">
         {/* Desktop Sidebar Panel Viewports */}
         <div className="hidden md:flex w-[260px] min-w-[260px] flex-col gap-4">
-          <SidebarContent />
+          <SidebarContent
+            selectedCategory={selectedCategory}
+            clearFilters={clearFilters}
+            categories={categories}
+            handleCategoryFilter={handleCategoryFilter}
+            rating={rating}
+            handleRating={handleRating}
+            minInput={minInput}
+            setminInput={setminInput}
+            maxInput={maxInput}
+            setmaxInput={setmaxInput}
+            includeOutOfStock={includeOutOfStock}
+            setIncludeOutOfStock={setIncludeOutOfStock}
+            brands={brands}
+            selectedBrands={selectedBrands}
+            handleBrandFilter={handleBrandFilter}
+          />
         </div>
 
         {/* Product Display Area */}
-        <div className="flex flex-col gap-6 flex-1 w-full max-w-6xl">
+        <div className="flex flex-col gap-6 flex-1 w-full ">
           {displayProducts.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-96 text-gray-400 text-center px-4">
               <p className="text-xl md:text-2xl mb-2">No products found</p>
@@ -326,6 +273,12 @@ const HomePage = () => {
         </div>
       </div>
     </div>
+
+    {/* Product Detail Modal */}
+    <SelectedProductMOdal
+      selectedProduct={selectedProduct}
+      setSelectedProduct={setSelectedProduct}
+    />
   );
 };
 
